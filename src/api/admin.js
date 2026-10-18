@@ -7,22 +7,6 @@ const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 //---------- AUTH ----------
 
-//Login admin. Kalau akunnya bukan admin, otomatis dikeluarkan lagi
-export async function loginAdmin(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) throw new ApiError(401, 'INVALID_LOGIN', 'Email atau password salah')
-
-  if (data.user.app_metadata?.role !== 'admin') {
-    await supabase.auth.signOut()
-    throw new ApiError(403, 'FORBIDDEN', 'Akun ini bukan admin')
-  }
-  return data.user
-}
-
-export async function logoutAdmin() {
-  await supabase.auth.signOut()
-}
-
 //Untuk menjaga halaman admin: true kalau sedang login sebagai admin
 export async function isAdminLoggedIn() {
   const { data } = await supabase.auth.getSession()

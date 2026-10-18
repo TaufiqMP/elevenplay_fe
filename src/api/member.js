@@ -78,14 +78,19 @@ export async function resendConfirmationEmail(email) {
   }
 }
 
-//Login member komunitas (bukan admin)
-export async function loginMember(email, password) {
+//Login untuk semua akun (member dan admin)
+export async function login(email, password) {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+
   if (error) {
     if (error.code === 'email_not_confirmed') {
       throw new ApiError(403, 'EMAIL_NOT_CONFIRMED', 'Email belum dikonfirmasi. Cek inbox atau folder spam')
     }
+    if (error.status === 429) {
+      throw new ApiError(429, 'RATE_LIMIT', 'Terlalu banyak percobaan, coba lagi nanti')
+    }
     throw new ApiError(401, 'INVALID_LOGIN', 'Email atau kata sandi salah')
   }
-  return data.user
+
+  return { user: data.user, isAdmin: data.user.app_metadata?.role === 'admin' }
 }
