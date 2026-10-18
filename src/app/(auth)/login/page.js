@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { loginMember, resendConfirmationEmail } from '@/api/member';
+import { login, resendConfirmationEmail } from '@/api/member';
 import { supabase } from '@/supabase';
 
 export default function LoginPage() {
@@ -53,7 +53,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      await loginMember(trimmedEmail, password);
+      await login(trimmedEmail, password);
       // Login sukses
       router.push('/');
       router.refresh();
