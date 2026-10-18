@@ -1,13 +1,38 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import { supabase } from '@/supabase';
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+    } catch (err) {
+      console.error('Gagal logout:', err);
+    }
+  };
 
   const navLinks = [
     { name: 'Beranda', path: '/' },
@@ -21,6 +46,12 @@ export default function Navbar() {
     }
     return false;
   };
+
+  const displayName =
+    user?.user_metadata?.username ||
+    user?.user_metadata?.full_name ||
+    user?.email?.split('@')[0] ||
+    'Member';
 
   return (
     <header className="sticky top-0 z-40 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white shadow-md">
@@ -53,25 +84,63 @@ export default function Navbar() {
             </Link>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-2">
-            {navLinks.map((link) => {
-              const active = isCurrentActive(link.path, link.name);
-              return (
-                <Link
-                  key={link.name}
-                  href={link.path}
-                  className={`px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 ${
-                    active
-                      ? 'bg-white text-orange-600 shadow-sm font-bold'
-                      : 'text-white/90 hover:text-white hover:bg-white/10'
-                  }`}
+          {/* Desktop Navigation & Actions */}
+          <div className="hidden md:flex items-center gap-5">
+            <nav className="flex items-center gap-2">
+              {navLinks.map((link) => {
+                const active = isCurrentActive(link.path, link.name);
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.path}
+                    className={`px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 ${
+                      active
+                        ? 'bg-white text-orange-600 shadow-sm font-bold'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            <div className="h-6 w-px bg-white/25" />
+
+            {/* Auth Buttons */}
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-white/15 px-3.5 py-1.5 rounded-lg border border-white/20 text-sm">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span className="font-semibold text-white max-w-[130px] truncate" title={displayName}>
+                    {displayName}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="px-3.5 py-1.5 rounded-lg text-sm font-semibold text-white/90 hover:text-white hover:bg-white/15 border border-white/20 transition-all"
                 >
-                  {link.name}
+                  Keluar
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2.5">
+                <Link
+                  href="/login"
+                  className="px-4 py-2 rounded-lg text-sm font-bold text-white hover:bg-white/10 transition-all border border-white/30"
+                >
+                  Masuk
                 </Link>
-              );
-            })}
-          </nav>
+                <Link
+                  href="/register"
+                  className="px-4 py-2 rounded-lg text-sm font-bold bg-white text-orange-600 hover:bg-orange-50 transition-all shadow-sm"
+                >
+                  Daftar
+                </Link>
+              </div>
+            )}
+          </div>
 
           {/* Mobile Hamburger Button */}
           <div className="flex md:hidden">
@@ -97,7 +166,7 @@ export default function Navbar() {
 
       {/* Mobile Dropdown Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-orange-400/40 bg-orange-600 px-4 pt-3 pb-4 space-y-1 shadow-inner">
+        <div className="md:hidden border-t border-orange-400/40 bg-orange-600 px-4 pt-3 pb-4 space-y-2 shadow-inner">
           {navLinks.map((link) => {
             const active = isCurrentActive(link.path, link.name);
             return (
@@ -115,8 +184,49 @@ export default function Navbar() {
               </Link>
             );
           })}
+
+          <div className="pt-2 border-t border-orange-400/40">
+            {user ? (
+              <div className="space-y-2">
+                <div className="px-4 py-2 text-sm text-orange-100 flex items-center gap-2 bg-orange-700/30 rounded-lg">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                  <span className="truncate">
+                    Login sebagai: <strong className="text-white">{displayName}</strong>
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleLogout();
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors"
+                >
+                  Keluar
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-center px-4 py-2.5 rounded-lg text-sm font-bold text-white border border-white/40 hover:bg-white/10 transition-colors"
+                >
+                  Masuk
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-center px-4 py-2.5 rounded-lg text-sm font-bold bg-white text-orange-600 hover:bg-orange-50 transition-colors shadow-sm"
+                >
+                  Daftar
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </header>
   );
 }
+
