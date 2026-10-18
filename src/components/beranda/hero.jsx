@@ -20,7 +20,7 @@ export default function Hero() {
         {/* Wrapper relative: dipakai sebagai patokan posisi maskot */}
         <div className="relative">
           <div className="rounded-sm border border-orange-300/60 bg-orange-500/80 p-6 text-white backdrop-blur-sm sm:p-10 md:w-[700px] lg:w-[650px]">
-            <h1 className="text-4xl font-extrabold italic sm:text-6xl md:text-7xl">
+            <h1 className="text-4xl font-bold italic sm:text-6xl md:text-7xl">
               Elevenplay
             </h1>
             <p className="mt-2 text-lg font-semibold italic sm:text-2xl">

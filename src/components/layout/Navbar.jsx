@@ -44,7 +44,7 @@ export default function Navbar() {
 
           <Link
             href="/"
-            className="text-2xl font-medium italic tracking-wide sm:text-3xl"
+            className="text-2xl font-bold italic tracking-wide sm:text-3xl"
           >
             ELEVENPLAY
           </Link>
@@ -80,7 +80,7 @@ export default function Navbar() {
                 className={`border-b-2 py-1 text-lg transition-colors ${
                   active
                     ? 'border-white font-bold'
-                    : 'border-transparent text-white/90 hover:border-white/60 hover:text-white'
+                    : 'border-transparent font-semibold text-white/90 hover:border-white/60 hover:text-white'
                 }`}
               >
                 {link.name}
