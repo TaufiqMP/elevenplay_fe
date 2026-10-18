@@ -1,8 +1,7 @@
-import React, { Suspense } from "react";
+import React from "react";
 import { Plus_Jakarta_Sans, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import AppShell from "@/components/layout/AppShell";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta-sans",
@@ -31,12 +30,6 @@ export const metadata = {
   },
 };
 
-function NavbarFallback() {
-  return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white shadow-md h-20" />
-  );
-}
-
 export default function RootLayout({ children }) {
   return (
     <html
@@ -44,14 +37,11 @@ export default function RootLayout({ children }) {
       className={`${plusJakartaSans.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-800">
-        <Suspense fallback={<NavbarFallback />}>
-          <Navbar />
-        </Suspense>
-        <main className="flex-1">
+        <AppShell>
           {children}
-        </main>
-        <Footer />
+        </AppShell>
       </body>
     </html>
   );
 }
+
