@@ -6,6 +6,12 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { supabase } from '@/supabase';
 
+const navLinks = [
+  { name: 'Beranda', path: '/' },
+  { name: 'E-Katalog', path: '/katalog' },
+  { name: 'Forum', path: '#' },
+];
+
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -42,9 +48,9 @@ export default function Navbar() {
 
   const isCurrentActive = (path, name) => {
     if (name === 'E-Katalog') {
-      return pathname === '/' || (pathname && pathname.startsWith('/katalog'));
+      return pathname === path || pathname.startsWith(`${path}/`);
     }
-    return false;
+    return pathname === path;
   };
 
   const displayName =
@@ -54,35 +60,24 @@ export default function Navbar() {
     'Member';
 
   return (
-    <header className="sticky top-0 z-40 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-500 text-white shadow-md">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo & Brand */}
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-3 group focus:outline-none">
-              {/* Eagle Wing Emblem Image */}
-              <div className="w-12 h-12 flex items-center justify-center group-hover:scale-105 transition-transform relative">
-                <Image
-                  src="/logo-elevenplay.png"
-                  alt="Elevenplay Logo"
-                  width={48}
-                  height={48}
-                  priority
-                  className="w-full h-full object-contain drop-shadow filter brightness-105"
-                />
-              </div>
-
-              {/* Brand Typography */}
-              <div className="flex flex-col">
-                <span className="text-2xl font-black italic tracking-wider text-white drop-shadow-sm font-sans">
-                  ELEVENPLAY
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-orange-100 -mt-1 opacity-90">
-                  eFootball Hub Indonesia
-                </span>
-              </div>
-            </Link>
-          </div>
+    <header className="sticky top-0 z-40 bg-[#FF7F00] text-white shadow-md">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
+        {/* Baris 1: logo di kiri, nama brand di tengah */}
+        <div className="relative flex h-20 items-center justify-center">
+          <Link
+            href="/"
+            aria-label="Elevenplay, ke beranda"
+            className="absolute left-0 top-1/2 -translate-y-1/2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+          >
+            <Image
+              src="/logo-elevenplay.png"
+              alt="Elevenplay Logo"
+              width={64}
+              height={64}
+              priority
+              className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+            />
+          </Link>
 
           {/* Desktop Navigation & Actions */}
           <div className="hidden md:flex items-center gap-5">
@@ -142,29 +137,48 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Hamburger Button */}
-          <div className="flex md:hidden">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-lg text-white hover:bg-white/10 focus:outline-none"
-              aria-label="Buka menu navigasi"
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
-          </div>
+          {/* Tombol hamburger (mobile) */}
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="absolute right-0 top-1/2 -translate-y-1/2 rounded-lg p-2 hover:bg-white/10 focus:outline-none md:hidden"
+            aria-label="Buka menu navigasi"
+            aria-expanded={mobileMenuOpen}
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.5"
+                d={mobileMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
+              />
+            </svg>
+          </button>
         </div>
+
+        {/* Baris 2: menu (desktop) */}
+        <nav className="hidden h-12 items-center gap-10 md:flex lg:gap-16" aria-label="Menu utama">
+          {navLinks.map((link) => {
+            const active = isCurrentActive(link.path, link.name);
+            return (
+              <Link
+                key={link.name}
+                href={link.path}
+                aria-current={active ? 'page' : undefined}
+                className={`border-b-2 py-1 text-lg transition-colors ${
+                  active
+                    ? 'border-white font-bold'
+                    : 'border-transparent text-white/90 hover:border-white/60 hover:text-white'
+                }`}
+              >
+                {link.name}
+              </Link>
+            );
+          })}
+        </nav>
       </div>
 
-      {/* Mobile Dropdown Navigation */}
+      {/* Menu dropdown (mobile) */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-orange-400/40 bg-orange-600 px-4 pt-3 pb-4 space-y-2 shadow-inner">
           {navLinks.map((link) => {
@@ -174,10 +188,8 @@ export default function Navbar() {
                 key={link.name}
                 href={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-4 py-2.5 rounded-lg text-base font-medium transition-colors ${
-                  active
-                    ? 'bg-white text-orange-600 font-bold shadow-sm'
-                    : 'text-white hover:bg-white/10'
+                className={`block rounded-lg px-4 py-2.5 text-base transition-colors ${
+                  active ? 'bg-white font-bold text-orange-600' : 'font-medium hover:bg-white/10'
                 }`}
               >
                 {link.name}
