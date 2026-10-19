@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { supabase } from '@/supabase';
 
-const navLinks = [
+const baseNavLinks = [
   { name: 'Beranda', path: '/' },
   { name: 'E-Katalog', path: '/katalog' },
   { name: 'Forum', path: '#' },
@@ -16,6 +16,10 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const pathname = usePathname();
+  const navLinks =
+    user?.app_metadata?.role === 'admin'
+      ? [...baseNavLinks, { name: 'Admin', path: '/admin' }]
+      : baseNavLinks;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -40,14 +44,11 @@ export default function Navbar() {
     }
   };
 
-  const navLinks = [
-    { name: 'Beranda', path: '/' },
-    { name: 'E-Katalog', path: '/' },
-    { name: 'Forum', path: '#' },
-  ];
-
   const isCurrentActive = (path, name) => {
     if (name === 'E-Katalog') {
+      return pathname === path || pathname.startsWith(`${path}/`);
+    }
+    if (name === 'Admin') {
       return pathname === path || pathname.startsWith(`${path}/`);
     }
     return pathname === path;
@@ -79,29 +80,8 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* Desktop Navigation & Actions */}
-          <div className="hidden md:flex items-center gap-5">
-            <nav className="flex items-center gap-2">
-              {navLinks.map((link) => {
-                const active = isCurrentActive(link.path, link.name);
-                return (
-                  <Link
-                    key={link.name}
-                    href={link.path}
-                    className={`px-4 py-2 rounded-lg text-base font-semibold transition-all duration-200 ${
-                      active
-                        ? 'bg-white text-orange-600 shadow-sm font-bold'
-                        : 'text-white/90 hover:text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                );
-              })}
-            </nav>
-
-            <div className="h-6 w-px bg-white/25" />
-
+          {/* Desktop account actions */}
+          <div className="absolute right-0 top-1/2 hidden -translate-y-1/2 items-center md:flex">
             {/* Auth Buttons */}
             {user ? (
               <div className="flex items-center gap-3">
@@ -241,4 +221,3 @@ export default function Navbar() {
     </header>
   );
 }
-

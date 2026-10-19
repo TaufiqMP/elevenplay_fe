@@ -5,8 +5,6 @@ export const metadata = {
   robots: { index: false, follow: false }, // jangan masuk hasil pencarian Google
 };
 
-// TODO: proteksi halaman ini dengan login admin (lihat isAdminLoggedIn),
-// misalnya lewat app/admin/layout.js, sebelum dipublikasikan.
 export default function AdminPage() {
   return (
     <div className="mx-auto max-w-[1440px] px-4 py-10 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
