@@ -28,6 +28,12 @@ export async function getAdminAccounts({ page = 1, limit = 12, status } = {}) {
   return request(`/admin/accounts${toQuery({ page, limit, status })}`, { token })
 }
 
+//Detail akun admin berdasarkan id; bisa mengambil akun draft atau archived.
+export async function getAdminAccount(id) {
+  const token = await getToken()
+  return request(`/admin/accounts/${encodeURIComponent(id)}`, { token })
+}
+
 //Tambah akun. Kode (EK-xxxx) dibuat otomatis oleh backend
 export async function createAccount(body) {
   const token = await getToken()

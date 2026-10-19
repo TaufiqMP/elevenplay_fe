@@ -70,7 +70,7 @@ export default function KatalogManager() {
         </div>
         <Link
           href="/admin/katalog/baru"
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-emerald-500 px-6 py-3 font-bold text-white hover:bg-emerald-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-emerald-500 px-6 py-3 font-bold text-white hover:bg-emerald-600 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
         >
           <PlusCircleIcon />
           Tambah Akun Baru

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { SECTIONS, initialValues, toPayload } from './accountfields';
+import { SECTIONS, initialValues, toPayload, toUpdatePayload } from './accountfields';
 import PhotoPicker from './photopicker';
 import CardPreview from './cardpreview';
 
@@ -22,7 +22,7 @@ function Card({ title, children }) {
   );
 }
 
-function Field({ f, value, onChange }) {
+function Field({ f, value, onChange, readOnly = false }) {
   const id = `field-${f.key}`;
   return (
     <div className={f.span ?? ''}>
@@ -36,6 +36,9 @@ function Field({ f, value, onChange }) {
       ) : f.type === 'select' ? (
         <select id={id} value={value} onChange={onChange} className={controlClass}>
           {!f.noEmpty && <option value="">Pilih...</option>}
+          {f.key === 'status' && value === 'archived' && (
+            <option value="archived">Arsip</option>
+          )}
           {f.options.map((o) => {
             const opt = typeof o === 'string' ? { value: o, label: o } : o;
             return <option key={opt.value} value={opt.value}>{opt.label}</option>;
@@ -48,29 +51,69 @@ function Field({ f, value, onChange }) {
           min={f.min}
           inputMode={f.type === 'number' ? 'numeric' : undefined}
           required={f.required}
+          readOnly={readOnly}
           value={value}
           onChange={onChange}
           placeholder={f.placeholder}
-          className={controlClass}
+          className={`${controlClass} ${readOnly ? 'bg-slate-100 text-slate-500' : ''}`}
         />
       )}
     </div>
   );
 }
 
-export default function AccountForm() {
+function getFormValues(account) {
+  const values = initialValues();
+  if (!account) return values;
+
+  for (const section of SECTIONS) {
+    for (const field of section.fields) {
+      if (field.key === 'edition_code') {
+        values[field.key] = account.edition_code ?? account.code ?? '';
+        continue;
+      }
+      const value = account[field.key];
+      if (value != null) {
+        values[field.key] = field.type === 'date' ? String(value).slice(0, 10) : String(value);
+      }
+    }
+  }
+  return values;
+}
+
+function getGalleryUrls(account) {
+  if (!Array.isArray(account?.gallery)) return [];
+  return account.gallery
+    .map((image) => (typeof image === 'string' ? image : image?.url ?? image?.src ?? null))
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
+export default function AccountForm({ initialAccount = null }) {
   const router = useRouter();
-  const [values, setValues] = useState(initialValues);
+  const isEditing = Boolean(initialAccount);
+  const initialFormValues = getFormValues(initialAccount);
+  const initialGalleryUrls = getGalleryUrls(initialAccount);
+  const [values, setValues] = useState(initialFormValues);
   const [mainFile, setMainFile] = useState(null);
-  const [extraFiles, setExtraFiles] = useState([]);
+  const [mainImageUrl, setMainImageUrl] = useState(initialAccount?.main_image_url ?? null);
+  const [extraFiles, setExtraFiles] = useState(() => Array(4).fill(null));
+  const [extraImageUrls, setExtraImageUrls] = useState(initialGalleryUrls);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+
+  const hasChanges =
+    JSON.stringify(values) !== JSON.stringify(initialFormValues) ||
+    mainFile !== null ||
+    mainImageUrl !== (initialAccount?.main_image_url ?? null) ||
+    JSON.stringify(extraImageUrls) !== JSON.stringify(initialGalleryUrls) ||
+    extraFiles.some(Boolean);
 
   const set = (key) => (e) => setValues((v) => ({ ...v, [key]: e.target.value }));
 
   // finalStatus: 'draft' untuk tombol Draf, atau null untuk memakai "Status tampil"
   async function save(finalStatus) {
-    if (saving) return;
+    if (saving || (isEditing && !hasChanges && finalStatus !== 'draft')) return;
     setError('');
     if (!values.title.trim()) {
       setError('Judul wajib diisi.');
@@ -81,17 +124,33 @@ export default function AccountForm() {
     try {
       const api = await loadApi();
 
-      // 1) unggah foto dulu, hasilnya URL publik
-      const main_image_url = mainFile ? await api.uploadAccountImage(mainFile) : undefined;
-      const gallery = await Promise.all(extraFiles.map((f) => api.uploadAccountImage(f)));
+      const main_image_url = mainFile
+        ? await api.uploadAccountImage(mainFile)
+        : isEditing
+          ? mainImageUrl
+          : undefined;
+      const gallery = await Promise.all(
+        Array.from({ length: 4 }, async (_, index) => {
+          if (extraFiles[index]) return api.uploadAccountImage(extraFiles[index]);
+          return extraImageUrls[index] ?? null;
+        }),
+      );
+      const savedGallery = gallery.filter(Boolean);
 
-      // 2) simpan akun (kode EK-xxxx dibuat otomatis oleh backend)
-      await api.createAccount({
-        ...toPayload(values),
-        ...(finalStatus ? { status: finalStatus } : {}),
-        main_image_url,
-        gallery: gallery.length ? gallery : undefined,
-      });
+      if (isEditing) {
+        await api.updateAccount(initialAccount.id, {
+          ...toUpdatePayload({ ...values, status: finalStatus ?? values.status }),
+          main_image_url,
+          gallery: savedGallery,
+        });
+      } else {
+        await api.createAccount({
+          ...toPayload(values),
+          ...(finalStatus ? { status: finalStatus } : {}),
+          main_image_url,
+          gallery: savedGallery.length ? savedGallery : undefined,
+        });
+      }
 
       router.push('/admin');
     } catch (err) {
@@ -102,7 +161,8 @@ export default function AccountForm() {
     }
   }
 
-  const btn = 'rounded-sm px-8 py-2.5 font-semibold text-white disabled:opacity-60';
+  const btn = 'rounded-sm px-8 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60';
+  const updateDisabled = saving || (isEditing && !hasChanges);
 
   return (
     <form
@@ -128,20 +188,29 @@ export default function AccountForm() {
           <nav aria-label="Breadcrumb" className="mt-1 text-lg text-slate-500">
             <Link href="/admin" className="hover:text-orange-600">Kelola E-Katalog</Link>
             {' > '}
-            <span className="text-orange-500">Tambah Katalog</span>
+            <span className="text-orange-500">{isEditing ? 'Ubah Katalog' : 'Tambah Katalog'}</span>
           </nav>
-          <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl">Input Akun E-Katalog</h1>
-          <p className="mt-1 text-xl text-slate-800">Isi data akun dan lihat preview-nya</p>
+          <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl">
+            {isEditing ? 'Ubah Akun E-Katalog' : 'Input Akun E-Katalog'}
+          </h1>
+          <p className="mt-1 text-xl text-slate-800">
+            {isEditing ? 'Perbarui data akun dan lihat preview-nya' : 'Isi data akun dan lihat preview-nya'}
+          </p>
         </div>
         <div className="flex flex-wrap gap-4">
           <button type="button" onClick={() => router.push('/admin')} disabled={saving} className={`${btn} bg-red-500 hover:bg-red-600`}>
             Batal
           </button>
-          <button type="button" onClick={() => save('draft')} disabled={saving} className={`${btn} bg-neutral-600 hover:bg-neutral-700`}>
+          <button
+            type="button"
+            onClick={() => save('draft')}
+            disabled={saving || (isEditing && !hasChanges && values.status === 'draft')}
+            className={`${btn} bg-neutral-600 hover:bg-neutral-700`}
+          >
             Draf
           </button>
-          <button type="submit" disabled={saving} className={`${btn} bg-emerald-500 hover:bg-emerald-600`}>
-            {saving ? 'Menyimpan...' : 'Simpan'}
+          <button type="submit" disabled={updateDisabled} className={`${btn} bg-emerald-500 hover:bg-emerald-600`}>
+            {saving ? (isEditing ? 'Memperbarui...' : 'Menyimpan...') : isEditing ? 'Update' : 'Simpan'}
           </button>
         </div>
       </div>
@@ -159,8 +228,12 @@ export default function AccountForm() {
             <PhotoPicker
               mainFile={mainFile}
               onMainChange={setMainFile}
+              mainImageUrl={mainImageUrl}
+              onMainImageRemove={() => setMainImageUrl(null)}
               extraFiles={extraFiles}
               onExtraChange={setExtraFiles}
+              extraImageUrls={extraImageUrls}
+              onExtraImageUrlsChange={setExtraImageUrls}
             />
           </Card>
 
@@ -168,7 +241,13 @@ export default function AccountForm() {
             <Card key={section.id} title={section.title}>
               <div className={`grid gap-x-6 gap-y-5 ${section.grid}`}>
                 {section.fields.map((f) => (
-                  <Field key={f.key} f={f} value={values[f.key]} onChange={set(f.key)} />
+                  <Field
+                    key={f.key}
+                    f={f}
+                    value={values[f.key]}
+                    onChange={set(f.key)}
+                    readOnly={isEditing && f.key === 'edition_code'}
+                  />
                 ))}
               </div>
             </Card>
@@ -182,6 +261,7 @@ export default function AccountForm() {
             subtitle={values.subtitle}
             tierLabel={values.tier_label}
             mainFile={mainFile}
+            mainImageUrl={mainImageUrl}
           />
         </aside>
       </div>

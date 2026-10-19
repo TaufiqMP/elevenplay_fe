@@ -1,9 +1,4 @@
-// SEMUA nama field backend ada di file ini; kalau beda, cukup ubah `key` di sini.
-//
-// PASTI ada (dari API-mu): title, subtitle, tier_label, main_image_url, gallery, status.
-// TEBAKAN dari halaman detail: edition_code, platform, team_strength, epic, big_time,
-// showtime, coin, gp, division, note, detail, linked_to, login_method, last_checked_at.
-// Pilihan dropdown (options) juga tebakan, sesuaikan dengan data aslimu.
+// Field katalog mengikuti nama kolom yang dipakai API backend.
 
 const num = { type: 'number', min: 0 };
 
@@ -29,7 +24,7 @@ export const SECTIONS = [
       { key: 'epic', label: 'Epic', ...num },
       { key: 'big_time', label: 'Bigtime', ...num },
       { key: 'showtime', label: 'Showtime', ...num },
-      { key: 'coin', label: 'Koin', ...num },
+      { key: 'coins', label: 'Koin', ...num },
       { key: 'gp', label: 'GP', ...num },
       { key: 'division', label: 'Divisi', ...num },
     ],
@@ -80,6 +75,23 @@ export function toPayload(values) {
       const raw = values[f.key];
       if (raw === '' || raw == null) continue;
       out[f.key] = f.type === 'number' ? Number(raw) : String(raw).trim();
+    }
+  }
+  return out;
+}
+
+// Update payloads include nulls so optional fields can be cleared.
+export function toUpdatePayload(values) {
+  const out = {};
+  for (const s of SECTIONS) {
+    for (const f of s.fields) {
+      if (f.key === 'edition_code') continue;
+      const raw = values[f.key];
+      out[f.key] = raw === '' || raw == null
+        ? null
+        : f.type === 'number'
+          ? Number(raw)
+          : String(raw).trim();
     }
   }
   return out;

@@ -25,7 +25,7 @@ function RemoveButton({ onClick, label }) {
   );
 }
 
-function MainDropzone({ file, onChange }) {
+function MainDropzone({ file, imageUrl, onChange, onRemoveImage }) {
   const inputRef = useRef(null);
   const url = useObjectUrl(file);
   const pick = (f) => f && onChange(f);
@@ -45,14 +45,22 @@ function MainDropzone({ file, onChange }) {
         }}
         className="grid h-56 cursor-pointer place-items-center overflow-hidden rounded-md border border-dashed border-slate-400 bg-neutral-100 text-slate-800 hover:bg-neutral-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-500 sm:h-64"
       >
-        {url ? (
+        {url || imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Pratinjau foto utama" className="h-full w-full object-cover" />
+          <img src={url || imageUrl} alt="Pratinjau foto utama" className="h-full w-full object-cover" />
         ) : (
           <span>Tarik file kesini atau klik untuk pilih</span>
         )}
       </div>
-      {url && <RemoveButton onClick={() => onChange(null)} label="Hapus foto utama" />}
+      {(url || imageUrl) && (
+        <RemoveButton
+          onClick={() => {
+            onChange(null);
+            onRemoveImage();
+          }}
+          label="Hapus foto utama"
+        />
+      )}
       <input
         ref={inputRef}
         type="file"
@@ -67,7 +75,7 @@ function MainDropzone({ file, onChange }) {
   );
 }
 
-function ThumbSlot({ index, file, onPick, onRemove }) {
+function ThumbSlot({ index, file, imageUrl, onPick, onRemove }) {
   const inputRef = useRef(null);
   const url = useObjectUrl(file);
 
@@ -79,14 +87,14 @@ function ThumbSlot({ index, file, onPick, onRemove }) {
         aria-label={file ? `Ganti foto ${index + 1}` : `Tambah foto ${index + 1}`}
         className="grid aspect-[16/10] w-full place-items-center overflow-hidden rounded-md border border-dashed border-slate-400 bg-neutral-100 text-xs text-slate-800 hover:bg-neutral-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-500"
       >
-        {url ? (
+        {url || imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt={`Pratinjau foto ${index + 1}`} className="h-full w-full object-cover" />
+          <img src={url || imageUrl} alt={`Pratinjau foto ${index + 1}`} className="h-full w-full object-cover" />
         ) : (
           `+ Foto ${index + 1}`
         )}
       </button>
-      {url && <RemoveButton onClick={onRemove} label={`Hapus foto ${index + 1}`} />}
+      {(url || imageUrl) && <RemoveButton onClick={onRemove} label={`Hapus foto ${index + 1}`} />}
       <input
         ref={inputRef}
         type="file"
@@ -102,17 +110,41 @@ function ThumbSlot({ index, file, onPick, onRemove }) {
   );
 }
 
-export default function PhotoPicker({ mainFile, onMainChange, extraFiles, onExtraChange }) {
+export default function PhotoPicker({
+  mainFile,
+  onMainChange,
+  mainImageUrl,
+  onMainImageRemove,
+  extraFiles,
+  onExtraChange,
+  extraImageUrls = [],
+  onExtraImageUrlsChange,
+}) {
   function pickExtra(file, i) {
-    const next = [...extraFiles];
-    if (i < next.length) next[i] = file;
-    else next.push(file);
+    const next = Array.from({ length: MAX_EXTRA }, (_, index) => extraFiles[index] ?? null);
+    next[i] = file;
     onExtraChange(next);
+  }
+
+  function removeExtra(i) {
+    const nextFiles = Array.from({ length: MAX_EXTRA }, (_, index) => extraFiles[index] ?? null);
+    const nextUrls = Array.from({ length: MAX_EXTRA }, (_, index) => extraImageUrls[index] ?? null);
+    nextFiles.splice(i, 1);
+    nextFiles.push(null);
+    nextUrls.splice(i, 1);
+    nextUrls.push(null);
+    onExtraChange(nextFiles);
+    onExtraImageUrlsChange(nextUrls);
   }
 
   return (
     <div>
-      <MainDropzone file={mainFile} onChange={onMainChange} />
+      <MainDropzone
+        file={mainFile}
+        imageUrl={mainImageUrl}
+        onChange={onMainChange}
+        onRemoveImage={onMainImageRemove}
+      />
       <p className="mt-6 text-sm font-semibold text-slate-900">
         Foto tambahan <span className="ml-1 text-xs font-normal">(maks. {MAX_EXTRA}, tampil sebagai thumbnail)</span>
       </p>
@@ -122,8 +154,9 @@ export default function PhotoPicker({ mainFile, onMainChange, extraFiles, onExtr
             key={i}
             index={i}
             file={extraFiles[i] ?? null}
+            imageUrl={extraImageUrls[i] ?? null}
             onPick={(f) => pickExtra(f, i)}
-            onRemove={() => onExtraChange(extraFiles.filter((_, idx) => idx !== i))}
+            onRemove={() => removeExtra(i)}
           />
         ))}
       </div>

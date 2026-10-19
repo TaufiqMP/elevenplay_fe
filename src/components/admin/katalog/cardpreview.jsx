@@ -4,15 +4,15 @@ import { WhatsAppIcon } from '@/components/ui/icons';
 import { useObjectUrl } from './photopicker';
 
 // Tiruan kartu katalog publik, berubah langsung mengikuti isi form
-export default function CardPreview({ title, subtitle, tierLabel, mainFile }) {
+export default function CardPreview({ title, subtitle, tierLabel, mainFile, mainImageUrl }) {
   const url = useObjectUrl(mainFile);
 
   return (
     <div className="overflow-hidden rounded-md border border-slate-200 bg-white shadow-sm">
       <div className="relative aspect-[16/9] bg-neutral-200">
-        {url ? (
+        {url || mainImageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={url} alt="Pratinjau foto kartu" className="h-full w-full object-cover" />
+          <img src={url || mainImageUrl} alt="Pratinjau foto kartu" className="h-full w-full object-cover" />
         ) : (
           <span className="absolute inset-0 grid place-items-center text-sm text-slate-500">Belum ada foto</span>
         )}

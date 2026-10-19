@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { notFound } from 'next/navigation';
 import { getAccountByCode } from '@/api/accounts';
 import DetailGallery from '@/components/detail/DetailGallery';
@@ -43,6 +44,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function AccountDetailPage({ params }) {
+  await connection();
   const { code } = await params;
 
   let account = null;

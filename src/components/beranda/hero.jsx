@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const btn =
-  "rounded-sm border border-orange-300 bg-orange-500 px-8 py-2 text-center font-bold shadow hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white";
+  "rounded-[5px] border-[1px] border-[#EE6423] bg-[#FF7F00] px-8 py-2 text-center font-bold shadow hover:bg-orange-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white transition-all duration-300 active:scale-95";
 
 export default function Hero() {
   return (
@@ -19,7 +19,7 @@ export default function Hero() {
       <div className="mx-auto flex min-h-[320px] max-w-6xl items-center justify-center px-4 py-12 sm:min-h-[420px] md:min-h-[500px]">
         {/* Wrapper relative: dipakai sebagai patokan posisi maskot */}
         <div className="relative">
-          <div className="rounded-sm border border-orange-300/60 bg-orange-500/80 p-6 text-white backdrop-blur-sm sm:p-10 md:w-[700px] lg:w-[650px]">
+          <div className="rounded-[5px] border border-orange-300/60 bg-[linear-gradient(180deg,#FCA94B_0%,#FA951F_36%,#FA951F_54%)] p-6 text-white backdrop-blur-sm sm:p-10 md:w-[700px] lg:w-[650px]">
             <h1 className="text-4xl font-extrabold italic sm:text-6xl md:text-7xl">
               Elevenplay
             </h1>

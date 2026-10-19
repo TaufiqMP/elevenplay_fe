@@ -31,7 +31,7 @@ export default function AdminTabs({ forumPending = 0 }) {
       <div
         role="tablist"
         aria-label="Menu admin"
-        className="inline-flex max-w-full gap-2 overflow-x-auto rounded-2xl border border-slate-300 bg-white p-2"
+        className="inline-flex max-w-full gap-2 overflow-x-auto rounded-2xl border  border-slate-300 bg-white p-2"
       >
         {TABS.map(({ id, label, icon: Icon }) => {
           const selected = id === active;
@@ -44,7 +44,7 @@ export default function AdminTabs({ forumPending = 0 }) {
               aria-selected={selected}
               aria-controls={`panel-${id}`}
               onClick={() => setActive(id)}
-              className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-5 py-2.5 font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-600 ${
+              className={`inline-flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl border px-5 py-2.5 font-semibold transition-all duration-300 focus-visible:outline-2 focus-visible:outline-orange-600 ${
                 selected
                   ? 'border-orange-500 bg-orange-500 text-white'
                   : 'border-slate-300 bg-white text-slate-800 hover:border-orange-400'

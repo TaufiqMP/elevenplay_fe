@@ -145,7 +145,7 @@ export default function Navbar() {
                 key={link.name}
                 href={link.path}
                 aria-current={active ? 'page' : undefined}
-                className={`border-b-2 py-1 text-lg transition-colors ${
+                className={`border-b-2 py-1 text-lg transition-all duration-300 ${
                   active
                     ? 'border-white font-bold'
                     : 'border-transparent text-white/90 hover:border-white/60 hover:text-white'
