@@ -160,29 +160,34 @@ export default function Navbar() {
 
       {/* Menu dropdown (mobile) */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-orange-400/40 bg-orange-600 px-4 pt-3 pb-4 space-y-2 shadow-inner">
-          {navLinks.map((link) => {
-            const active = isCurrentActive(link.path, link.name);
-            return (
-              <Link
-                key={link.name}
-                href={link.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block rounded-lg px-4 py-2.5 text-base transition-colors ${
-                  active ? 'bg-white font-bold text-orange-600' : 'font-medium hover:bg-white/10'
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
+        <div className="border-t border-white/25 bg-[#FF7F00] px-4 py-4 shadow-inner sm:px-6 md:hidden">
+          <nav className="grid gap-1" aria-label="Menu utama">
+            {navLinks.map((link) => {
+              const active = isCurrentActive(link.path, link.name);
+              return (
+                <Link
+                  key={link.name}
+                  href={link.path}
+                  aria-current={active ? 'page' : undefined}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex min-h-11 items-center rounded-lg px-4 text-base transition-colors ${
+                    active
+                      ? 'bg-white font-bold text-orange-600 shadow-sm'
+                      : 'font-semibold text-white/95 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
 
-          <div className="pt-2 border-t border-orange-400/40">
+          <div className="mt-4 border-t border-white/25 pt-4">
             {user ? (
-              <div className="space-y-2">
-                <div className="px-4 py-2 text-sm text-orange-100 flex items-center gap-2 bg-orange-700/30 rounded-lg">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span className="truncate">
+              <div className="grid gap-3">
+                <div className="flex min-h-11 min-w-0 items-center gap-2 rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm text-white/90">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-300"></span>
+                  <span className="min-w-0 truncate">
                     Login sebagai: <strong className="text-white">{displayName}</strong>
                   </span>
                 </div>
@@ -192,24 +197,24 @@ export default function Navbar() {
                     handleLogout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-2.5 rounded-lg text-sm font-semibold text-white bg-white/10 hover:bg-white/20 transition-colors"
+                  className="flex min-h-11 w-full items-center justify-center rounded-lg border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/20"
                 >
                   Keluar
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-2 gap-3">
                 <Link
                   href="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-center px-4 py-2.5 rounded-lg text-sm font-bold text-white border border-white/40 hover:bg-white/10 transition-colors"
+                  className="flex min-h-11 items-center justify-center rounded-lg border border-white/35 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/10"
                 >
                   Masuk
                 </Link>
                 <Link
                   href="/register"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-center px-4 py-2.5 rounded-lg text-sm font-bold bg-white text-orange-600 hover:bg-orange-50 transition-colors shadow-sm"
+                  className="flex min-h-11 items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-bold text-orange-600 shadow-sm transition-colors hover:bg-orange-50"
                 >
                   Daftar
                 </Link>

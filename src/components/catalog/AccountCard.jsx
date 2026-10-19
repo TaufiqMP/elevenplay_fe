@@ -23,7 +23,7 @@ export default function AccountCard({ account }) {
   const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-card hover:shadow-card-hover hover:border-orange-300 transition-all duration-300 flex flex-col">
+    <div className="group ml-4 md:ml-0 bg-white rounded-[5px] border border-slate-200/90 overflow-hidden shadow-card hover:shadow-card-hover hover:border-orange-300 transition-all duration-300 flex flex-col">
       {/* Tautan Card Menuju Halaman Detail */}
       <Link
         href={`/katalog/${encodeURIComponent(code)}`}
@@ -98,7 +98,7 @@ export default function AccountCard({ account }) {
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-full shadow-sm hover:shadow-md transition-all duration-200 active:scale-95"
+            className="inline-flex items-center gap-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-[5px] shadow-sm hover:shadow-md transition-all duration-200 active:scale-95"
             title={`Hubungi Admin untuk akun ${code}`}
           >
             <span>Hubungi</span>

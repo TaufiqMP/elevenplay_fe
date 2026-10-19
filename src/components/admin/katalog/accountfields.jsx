@@ -9,7 +9,7 @@ export const SECTIONS = [
     grid: 'sm:grid-cols-3',
     fields: [
       { key: 'edition_code', label: 'Kode', placeholder: 'EF-1234...' },
-      { key: 'platform', label: 'Platform', type: 'select', options: ['Android', 'iOS', 'Konsol', 'PC'] },
+      { key: 'platform', label: 'Platform', type: 'select', options: ['android', 'ios'] },
       { key: 'tier_label', label: 'Label Tier', placeholder: 'Sultan' },
       { key: 'title', label: 'Judul', required: true, placeholder: 'Bale Biru x Udin', span: 'sm:col-span-3' },
       { key: 'subtitle', label: 'Subjudul', placeholder: 'Squad berisi formasi 4x3x3... (Isi sesuai deskripsi singkat akun)', span: 'sm:col-span-3' },

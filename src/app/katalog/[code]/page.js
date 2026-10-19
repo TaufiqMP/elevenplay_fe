@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { connection } from 'next/server';
 import { notFound } from 'next/navigation';
 import { getAccountByCode } from '@/api/accounts';
 import DetailGallery from '@/components/detail/DetailGallery';
 import DetailEdition from '@/components/detail/DetailEdition';
+import SkeletonDetail from '@/components/detail/SkeletonDetail';
 
 function formatNumber(value) {
   if (value === null || value === undefined || value === '') {
@@ -43,7 +44,7 @@ export async function generateMetadata({ params }) {
   }
 }
 
-export default async function AccountDetailPage({ params }) {
+async function AccountDetailContent({ params }) {
   await connection();
   const { code } = await params;
 
@@ -289,5 +290,13 @@ export default async function AccountDetailPage({ params }) {
         lastCheckedAt={account.last_checked_at}
       />
     </div>
+  );
+}
+
+export default function AccountDetailPage({ params }) {
+  return (
+    <Suspense fallback={<SkeletonDetail />}>
+      <AccountDetailContent params={params} />
+    </Suspense>
   );
 }

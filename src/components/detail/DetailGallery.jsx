@@ -55,7 +55,7 @@ export default function DetailGallery({
   return (
     <div className="flex flex-col">
       {/* 1. Preview Gambar Utama */}
-      <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-2xl overflow-hidden border border-slate-200/90 shadow-card">
+      <div className="relative aspect-[16/9] w-full bg-slate-900 rounded-[5px] overflow-hidden border border-slate-200/90 shadow-card">
         {hasImages && !isCurrentFailed ? (
           <img
             src={currentImageUrl}
