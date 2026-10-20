@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import SectionHeading from "@/components/ui/sectionheading";
 import AccountCard from "@/components/catalog/AccountCard";
+import SkeletonCard from "@/components/catalog/SkeletonCard";
 import { getAccounts } from "@/api/accounts"; // sesuaikan path file API publikmu
 
 async function fetchAccounts() {
@@ -12,7 +14,7 @@ async function fetchAccounts() {
   }
 }
 
-export default async function KatalogSection() {
+async function KatalogContent() {
   const accounts = await fetchAccounts();
 
   return (
@@ -36,5 +38,35 @@ export default async function KatalogSection() {
         </div>
       )}
     </section>
+  );
+}
+
+function KatalogFallback() {
+  return (
+    <section className="mx-auto max-w-6xl px-4 py-16">
+      <SectionHeading
+        title="E-Katalog"
+        subtitle="Cari squad e-football impianmu, ready semua spesifikasi!"
+      />
+
+      <div
+        aria-label="Memuat katalog"
+        className="-mx-4 mt-6 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4"
+      >
+        {Array.from({ length: 3 }, (_, index) => (
+          <div key={index} className="w-[85%] shrink-0 snap-start sm:w-[360px]">
+            <SkeletonCard />
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function KatalogSection() {
+  return (
+    <Suspense fallback={<KatalogFallback />}>
+      <KatalogContent />
+    </Suspense>
   );
 }
