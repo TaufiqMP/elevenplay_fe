@@ -58,6 +58,72 @@ export async function deleteAccountPermanently(id) {
   return request(`/admin/accounts/${id}?permanent=true`, { method: 'DELETE', token })
 }
 
+//---------- BERITA ----------
+
+//Semua berita, termasuk draft dan arsip
+export async function getAdminContents({ page = 1, limit = 12, status } = {}) {
+  const token = await getToken()
+  return request(`/admin/contents${toQuery({ page, limit, status })}`, { token })
+}
+
+//Detail berita admin berdasarkan id
+export async function getAdminContent(id) {
+  const token = await getToken()
+  return request(`/admin/contents/${encodeURIComponent(id)}`, { token })
+}
+
+//Buat berita; slug dan penulis diisi oleh backend
+export async function createContent(body) {
+  const token = await getToken()
+  return request('/admin/contents', { method: 'POST', body, token })
+}
+
+//Ubah sebagian field berita berdasarkan id
+export async function updateContent(id, body) {
+  const token = await getToken()
+  return request(`/admin/contents/${encodeURIComponent(id)}`, { method: 'PATCH', body, token })
+}
+
+//Arsipkan berita
+export async function archiveContent(id) {
+  const token = await getToken()
+  return request(`/admin/contents/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+}
+
+//Hapus permanen berita
+export async function deleteContentPermanently(id) {
+  const token = await getToken()
+  return request(`/admin/contents/${encodeURIComponent(id)}?permanent=true`, {
+    method: 'DELETE',
+    token,
+  })
+}
+
+//Buat kategori berita
+export async function createContentCategory(body) {
+  const token = await getToken()
+  return request('/admin/content-categories', { method: 'POST', body, token })
+}
+
+//Ubah nama kategori berita
+export async function updateContentCategory(id, body) {
+  const token = await getToken()
+  return request(`/admin/content-categories/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body,
+    token,
+  })
+}
+
+//Hapus kategori berita
+export async function deleteContentCategory(id) {
+  const token = await getToken()
+  return request(`/admin/content-categories/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+    token,
+  })
+}
+
 //---------- UPLOAD FOTO ----------
 
 //Upload satu foto ke Supabase Storage, hasilnya URL publik
