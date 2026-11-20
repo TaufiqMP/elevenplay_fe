@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
+import Select from '@/components/ui/select';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SECTIONS, initialValues, toPayload, toUpdatePayload } from './accountfields';
@@ -11,7 +12,7 @@ import CardPreview from './cardpreview';
 const loadApi = () => import('@/api/admin');
 
 const controlClass =
-  'mt-1 w-full rounded border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder:text-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300';
+  'mt-1.5 w-full rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-2.5 text-sm font-medium text-slate-900 shadow-sm placeholder:text-slate-400 transition-all duration-200 hover:border-orange-300 hover:bg-white focus:border-orange-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-orange-100';
 
 function Card({ title, children }) {
   return (
@@ -34,7 +35,7 @@ function Field({ f, value, onChange, readOnly = false }) {
       {f.type === 'textarea' ? (
         <textarea id={id} rows={f.rows ?? 4} value={value} onChange={onChange} placeholder={f.placeholder} className={controlClass} />
       ) : f.type === 'select' ? (
-        <select id={id} value={value} onChange={onChange} className={controlClass}>
+        <Select id={id} value={value} onChange={onChange} className={controlClass}>
           {!f.noEmpty && <option value="">Pilih...</option>}
           {f.key === 'status' && value === 'archived' && (
             <option value="archived">Arsip</option>
@@ -43,7 +44,7 @@ function Field({ f, value, onChange, readOnly = false }) {
             const opt = typeof o === 'string' ? { value: o, label: o } : o;
             return <option key={opt.value} value={opt.value}>{opt.label}</option>;
           })}
-        </select>
+        </Select>
       ) : (
         <input
           id={id}
@@ -120,6 +121,11 @@ export default function AccountForm({ initialAccount = null }) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
+    if (!isEditing && !values.edition_code.trim()) {
+      setError('Kode akun wajib diisi.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
     setSaving(true);
     try {
       const api = await loadApi();
@@ -161,7 +167,7 @@ export default function AccountForm({ initialAccount = null }) {
     }
   }
 
-  const btn = 'rounded-sm px-8 py-2.5 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60';
+  const btn = 'rounded-lg px-5 py-2 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0';
   const updateDisabled = saving || (isEditing && !hasChanges);
 
   return (
@@ -190,7 +196,7 @@ export default function AccountForm({ initialAccount = null }) {
             {' > '}
             <span className="text-orange-500">{isEditing ? 'Ubah Katalog' : 'Tambah Katalog'}</span>
           </nav>
-          <h1 className="text-4xl font-extrabold text-slate-900 sm:text-5xl">
+          <h1 className="text-3xl font-extrabold text-slate-900 sm:text-5xl">
             {isEditing ? 'Ubah Akun E-Katalog' : 'Input Akun E-Katalog'}
           </h1>
           <p className="mt-1 text-xl text-slate-800">
@@ -198,18 +204,18 @@ export default function AccountForm({ initialAccount = null }) {
           </p>
         </div>
         <div className="flex flex-wrap gap-4">
-          <button type="button" onClick={() => router.push('/admin')} disabled={saving} className={`${btn} bg-red-500 hover:bg-red-600`}>
+          <button type="button" onClick={() => router.push('/admin')} disabled={saving} className={`${btn} bg-gradient-to-r from-rose-500 to-red-600 shadow-red-500/30 hover:from-rose-600 hover:to-red-700`}>
             Batal
           </button>
           <button
             type="button"
             onClick={() => save('draft')}
             disabled={saving || (isEditing && !hasChanges && values.status === 'draft')}
-            className={`${btn} bg-neutral-600 hover:bg-neutral-700`}
+            className={`${btn} bg-gradient-to-r from-slate-500 to-slate-700 shadow-slate-500/30 hover:from-slate-600 hover:to-slate-800`}
           >
             Draf
           </button>
-          <button type="submit" disabled={updateDisabled} className={`${btn} bg-emerald-500 hover:bg-emerald-600`}>
+          <button type="submit" disabled={updateDisabled} className={`${btn} bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30 hover:from-orange-600 hover:to-amber-600`}>
             {saving ? (isEditing ? 'Memperbarui...' : 'Menyimpan...') : isEditing ? 'Update' : 'Simpan'}
           </button>
         </div>

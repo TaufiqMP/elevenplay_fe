@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { connection } from 'next/server';
 import { notFound } from 'next/navigation';
 import { getAccountByCode } from '@/api/accounts';
+import { getSettings } from '@/api/settings';
 import DetailGallery from '@/components/detail/DetailGallery';
 import DetailEdition from '@/components/detail/DetailEdition';
 import SkeletonDetail from '@/components/detail/SkeletonDetail';
@@ -110,14 +111,14 @@ async function AccountDetailContent({ params }) {
     notFound();
   }
 
-  // Konfigurasi WhatsApp Inquiry
-  const WHATSAPP_NUMBER = '6281234567890';
+  // Konfigurasi WhatsApp Inquiry. Nomor diambil dari Pengaturan, belum diisi = tombol disembunyikan
+  const settings = await getSettings().catch(() => null);
   const waAccountTitle = account.title || 'Akun eFootball';
   const waAccountCode = account.code || code || 'ACC';
   const waMessage = encodeURIComponent(
     `Halo Admin Elevenplay, saya tertarik dengan akun "${waAccountTitle}" (Kode: ${waAccountCode}). Apakah masih tersedia?`
   );
-  const waLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${waMessage}`;
+  const waLink = settings?.whatsapp_url ? `${settings.whatsapp_url}?text=${waMessage}` : null;
 
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 sm:py-8">
@@ -164,6 +165,7 @@ async function AccountDetailContent({ params }) {
         </div>
 
         {/* Tombol WhatsApp Hubungi Admin */}
+        {waLink && (
         <a
           href={waLink}
           target="_blank"
@@ -182,6 +184,7 @@ async function AccountDetailContent({ params }) {
             <path d="M12 2C6.477 2 2 6.477 2 12c0 1.891.524 3.662 1.435 5.177L2 22l4.981-1.396A9.957 9.957 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.2c-1.62 0-3.136-.46-4.428-1.258l-.317-.194-2.96.83.844-2.884-.213-.341A8.17 8.17 0 013.8 12c0-4.521 3.679-8.2 8.2-8.2 4.521 0 8.2 3.679 8.2 8.2 0 4.521-3.679 8.2-8.2 8.2z" />
           </svg>
         </a>
+        )}
       </div>
 
       {/* 3. Grid Dua Kolom: Gambar Utama & Ringkasan Spesifikasi */}

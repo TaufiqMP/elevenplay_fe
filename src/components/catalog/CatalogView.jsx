@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import Select from '@/components/ui/select';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { getAccounts } from '@/api/accounts';
 import AccountCard from './AccountCard';
@@ -272,7 +273,7 @@ export default function CatalogView() {
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-8 sm:py-12">
       {/* 1. Page Header */}
       <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
           E-Katalog
         </h1>
         <p className="mt-2 text-base sm:text-lg text-slate-600 font-medium leading-relaxed">
@@ -316,7 +317,7 @@ export default function CatalogView() {
           {/* Filter Dropdowns */}
           <div className="flex items-center gap-3">
             {/* Filter Tier */}
-            <select
+            <Select
               value={selectedTier}
               onChange={(e) => setSelectedTier(e.target.value)}
               className="w-full sm:w-44 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent cursor-pointer shadow-sm"
@@ -336,10 +337,10 @@ export default function CatalogView() {
                   <option value="Starter">Tier: Starter</option>
                 </>
               )}
-            </select>
+            </Select>
 
             {/* Filter Pengurutan */}
-            <select
+            <Select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full sm:w-40 px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent cursor-pointer shadow-sm"
@@ -347,7 +348,7 @@ export default function CatalogView() {
               <option value="DEFAULT">Urutkan: Terbaru</option>
               <option value="TITLE_ASC">Nama (A - Z)</option>
               <option value="TITLE_DESC">Nama (Z - A)</option>
-            </select>
+            </Select>
           </div>
         </div>
 
@@ -370,7 +371,7 @@ export default function CatalogView() {
       {/* 3. Main Content Area */}
       {/* KONDISI 1: LOADING */}
       {loading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 wide:grid-cols-4 gap-6 sm:gap-7">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-6">
           {Array.from({ length: 8 }).map((_, index) => (
             <SkeletonCard key={index} />
           ))}
@@ -449,7 +450,7 @@ export default function CatalogView() {
       {/* KONDISI 4: SUCCESS (DAFTAR KARTU AKUN) */}
       {!loading && !error && filteredAccounts.length > 0 && (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 wide:grid-cols-4 gap-6 sm:gap-7">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-6">
             {filteredAccounts.map((account) => (
               <AccountCard key={account.id || account.code} account={account} />
             ))}

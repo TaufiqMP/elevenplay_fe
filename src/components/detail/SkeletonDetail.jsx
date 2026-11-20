@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 
 export default function SkeletonDetail() {
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 sm:py-8 animate-pulse">
+    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-6 sm:py-8 skeleton">
       {/* 1. Breadcrumb & Back Skeleton */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 bg-slate-200 rounded-lg" />

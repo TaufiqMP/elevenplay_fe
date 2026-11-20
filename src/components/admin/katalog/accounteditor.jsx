@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { getAdminAccount } from '@/api/adminaccounts';
@@ -44,7 +44,7 @@ export default function AccountEditor({ accountId }) {
   }
 
   if (!account) {
-    return <div className="h-16 animate-pulse rounded-md bg-slate-100" aria-busy="true" aria-label="Memuat akun" />;
+    return <div className="h-16 skeleton rounded-md" aria-busy="true" aria-label="Memuat akun" />;
   }
 
   return <AccountForm initialAccount={account} />;

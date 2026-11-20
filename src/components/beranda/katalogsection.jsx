@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+﻿import { Suspense } from "react";
 import SectionHeading from "@/components/ui/sectionheading";
 import AccountCard from "@/components/catalog/AccountCard";
 import SkeletonCard from "@/components/catalog/SkeletonCard";
@@ -31,8 +31,8 @@ async function KatalogContent() {
       ) : (
         <div className="-mx-4 mt-6 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4">
           {accounts.map((item) => (
-            <div key={item.id} className="w-[85%] shrink-0 snap-start sm:w-[360px]">
-              <AccountCard account={item} />
+            <div key={item.id} className="flex h-[384px] w-[78%] shrink-0 snap-start sm:w-[320px]">
+              <AccountCard account={item} imageClass="aspect-[2/1]" />
             </div>
           ))}
         </div>
@@ -54,7 +54,7 @@ function KatalogFallback() {
         className="-mx-4 mt-6 flex snap-x snap-mandatory gap-6 overflow-x-auto px-4 pb-4"
       >
         {Array.from({ length: 3 }, (_, index) => (
-          <div key={index} className="w-[85%] shrink-0 snap-start sm:w-[360px]">
+          <div key={index} className="flex h-[384px] w-[78%] shrink-0 snap-start sm:w-[320px]">
             <SkeletonCard />
           </div>
         ))}

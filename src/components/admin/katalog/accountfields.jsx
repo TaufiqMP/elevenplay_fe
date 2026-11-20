@@ -8,9 +8,9 @@ export const SECTIONS = [
     title: '2. Info Utama',
     grid: 'sm:grid-cols-3',
     fields: [
-      { key: 'edition_code', label: 'Kode', placeholder: 'EF-1234...' },
+      { key: 'edition_code', label: 'Kode', required: true, placeholder: 'Mis. EK-0042 (bebas, maks. 30 karakter)' },
       { key: 'platform', label: 'Platform', type: 'select', options: ['android', 'ios'] },
-      { key: 'tier_label', label: 'Label Tier', placeholder: 'Sultan' },
+      { key: 'tier_label', label: 'Label Tier', type: 'select', options: ['Pemula', 'Jago', 'Pro', 'Sultan'] },
       { key: 'title', label: 'Judul', required: true, placeholder: 'Bale Biru x Udin', span: 'sm:col-span-3' },
       { key: 'subtitle', label: 'Subjudul', placeholder: 'Squad berisi formasi 4x3x3... (Isi sesuai deskripsi singkat akun)', span: 'sm:col-span-3' },
     ],
@@ -68,13 +68,15 @@ export function initialValues() {
 }
 
 // Isi form -> body request: field kosong dilewati, angka jadi number
+// Kolom "Kode" di form (edition_code) dikirim sebagai "code", sesuai nama kolom di database
 export function toPayload(values) {
   const out = {};
   for (const s of SECTIONS) {
     for (const f of s.fields) {
       const raw = values[f.key];
       if (raw === '' || raw == null) continue;
-      out[f.key] = f.type === 'number' ? Number(raw) : String(raw).trim();
+      const key = f.key === 'edition_code' ? 'code' : f.key;
+      out[key] = f.type === 'number' ? Number(raw) : String(raw).trim();
     }
   }
   return out;

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
@@ -188,7 +188,7 @@ export default function VerifikasiPage() {
   return (
     <Suspense
       fallback={
-        <div className="w-full max-w-[500px] bg-white rounded-3xl p-10 text-center animate-pulse">
+        <div className="w-full max-w-[500px] bg-white rounded-3xl p-10 text-center">
           <div className="w-16 h-16 bg-slate-200 rounded-full mx-auto mb-4" />
           <div className="h-6 w-48 bg-slate-200 rounded mx-auto mb-2" />
           <div className="h-4 w-64 bg-slate-100 rounded mx-auto" />

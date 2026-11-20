@@ -124,11 +124,102 @@ export async function deleteContentCategory(id) {
   })
 }
 
+//---------- JADWAL ----------
+
+//Semua jadwal, termasuk draf dan arsip
+export async function getAdminSchedules({ page = 1, limit = 12, status } = {}) {
+  const token = await getToken()
+  return request(`/admin/schedules${toQuery({ page, limit, status })}`, { token })
+}
+
+//Tambah jadwal
+export async function createSchedule(body) {
+  const token = await getToken()
+  return request('/admin/schedules', { method: 'POST', body, token })
+}
+
+//Ubah sebagian field jadwal berdasarkan id
+export async function updateSchedule(id, body) {
+  const token = await getToken()
+  return request(`/admin/schedules/${encodeURIComponent(id)}`, { method: 'PATCH', body, token })
+}
+
+//Arsipkan jadwal (hilang dari beranda, data tetap ada)
+export async function archiveSchedule(id) {
+  const token = await getToken()
+  return request(`/admin/schedules/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+}
+
+//Hapus permanen jadwal
+export async function deleteSchedulePermanently(id) {
+  const token = await getToken()
+  return request(`/admin/schedules/${encodeURIComponent(id)}?permanent=true`, { method: 'DELETE', token })
+}
+
+//---------- PENGATURAN ----------
+
+//Ubah akun TikTok dan/atau nomor WhatsApp admin
+export async function updateSettings(body) {
+  const token = await getToken()
+  return request('/admin/settings', { method: 'PATCH', body, token })
+}
+
+//---------- MODERASI FORUM ----------
+
+//Semua thread, termasuk yang disembunyikan. status boleh dikosongkan
+export async function getAdminForumThreads({ page = 1, limit = 12, status } = {}) {
+  const token = await getToken()
+  return request(`/admin/forum/threads${toQuery({ page, limit, status })}`, { token })
+}
+
+//Tayangkan lagi (published) atau sembunyikan (hidden) thread
+export async function setForumThreadStatus(id, status) {
+  const token = await getToken()
+  return request(`/admin/forum/threads/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    body: { status },
+    token,
+  })
+}
+
+//Sembunyikan komentar (tidak dihapus permanen)
+export async function hideForumComment(id) {
+  const token = await getToken()
+  return request(`/admin/forum/comments/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+}
+
+//Riwayat tindakan moderasi
+export async function getModerationLogs({ page = 1, limit = 20 } = {}) {
+  const token = await getToken()
+  return request(`/admin/moderation-logs${toQuery({ page, limit })}`, { token })
+}
+
+//---------- SAMPAH ----------
+
+//Barang yang diarsipkan. type: accounts, contents, schedules, threads, comments
+export async function getTrash({ type, page = 1, limit = 12 } = {}) {
+  const token = await getToken()
+  return request(`/admin/trash${toQuery({ type, page, limit })}`, { token })
+}
+
+//Pulihkan barang dari Sampah
+export async function restoreFromTrash(type, id) {
+  const token = await getToken()
+  return request(`/admin/trash/${encodeURIComponent(type)}/${encodeURIComponent(id)}/restore`, { method: 'POST', token })
+}
+
+//Hapus permanen. Hanya bisa untuk barang yang sudah di Sampah
+export async function purgeFromTrash(type, id) {
+  const token = await getToken()
+  return request(`/admin/trash/${encodeURIComponent(type)}/${encodeURIComponent(id)}`, { method: 'DELETE', token })
+}
+
 //---------- UPLOAD FOTO ----------
 
 //Upload satu foto ke Supabase Storage, hasilnya URL publik
 //Pakai URL itu untuk field main_image_url atau isi array gallery
-export async function uploadAccountImage(file) {
+//folder boleh diisi (mis. 'news') supaya foto tersimpan di subfolder bucket
+export async function uploadAccountImage(file, folder = '') {
   if (!IMAGE_TYPES.includes(file.type)) {
     throw new ApiError(422, 'VALIDATION_ERROR', 'Format harus JPG, PNG, atau WebP')
   }
@@ -137,7 +228,8 @@ export async function uploadAccountImage(file) {
   }
 
   const ext = file.name.split('.').pop().toLowerCase()
-  const path = `${crypto.randomUUID()}.${ext}`
+  const fileName = `${crypto.randomUUID()}.${ext}`
+  const path = folder ? `${folder}/${fileName}` : fileName
 
   const { error } = await supabase.storage
     .from(BUCKET)
@@ -146,4 +238,9 @@ export async function uploadAccountImage(file) {
 
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
   return data.publicUrl
+}
+
+//Upload foto berita (cover atau galeri) ke folder news/ di bucket yang sama
+export function uploadContentImage(file) {
+  return uploadAccountImage(file, 'news')
 }

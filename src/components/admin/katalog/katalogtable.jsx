@@ -11,7 +11,7 @@ const STATUS = {
 // sesuai respons /admin/accounts (mis. item.title atau item.name).
 const getTitle = (item) => item.title ?? item.name ?? item.code;
 
-export default function KatalogTable({ items, onArchive, onDelete, busyId }) {
+export default function KatalogTable({ items, onArchive, busyId }) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[760px] text-left">
@@ -67,9 +67,6 @@ export default function KatalogTable({ items, onArchive, onDelete, busyId }) {
                         <ArchiveIcon />
                       </button>
                     )}
-                    <button type="button" onClick={() => onDelete(item)} disabled={busy} aria-label={`Hapus permanen ${item.code}`} className="text-red-600 hover:text-red-800 disabled:opacity-40">
-                      <TrashIcon />
-                    </button>
                   </div>
                 </td>
               </tr>

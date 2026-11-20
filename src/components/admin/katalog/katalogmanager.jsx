@@ -1,6 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useConfirm } from '@/components/ui/confirmdialog';
+import Select from '@/components/ui/select';
 import Link from 'next/link';
 import { getAdminAccounts, archiveAccount, deleteAccountPermanently } from '@/api/adminaccounts';
 import { PlusCircleIcon } from '@/components/admin/icons';
@@ -15,6 +17,7 @@ const FILTERS = [
 ];
  
 export default function KatalogManager() {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [meta, setMeta] = useState(null);
   const [page, setPage] = useState(1);
@@ -42,7 +45,7 @@ export default function KatalogManager() {
   }, [load]);
  
   async function run(item, actionName, confirmText) {
-    if (!window.confirm(confirmText)) return;
+    if (!(await confirm({ message: confirmText, confirmText: 'Ya, lanjutkan', danger: true }))) return;
     setBusyId(item.id);
     setError('');
     try {
@@ -70,7 +73,7 @@ export default function KatalogManager() {
         </div>
         <Link
           href="/admin/katalog/baru"
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-emerald-500 px-6 py-3 font-bold text-white hover:bg-emerald-600 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30 px-6 py-3 font-bold text-white hover:from-orange-600 hover:to-amber-600 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
         >
           <PlusCircleIcon />
           Tambah Akun Baru
@@ -81,7 +84,7 @@ export default function KatalogManager() {
         <label className="text-sm font-semibold text-slate-700" htmlFor="filter-status">
           Filter:{' '}
         </label>
-        <select
+        <Select
           id="filter-status"
           value={status}
           onChange={(e) => {
@@ -93,7 +96,7 @@ export default function KatalogManager() {
           {FILTERS.map((f) => (
             <option key={f.value} value={f.value}>{f.label}</option>
           ))}
-        </select>
+        </Select>
       </div>
  
       {error && !loading && (
@@ -107,7 +110,7 @@ export default function KatalogManager() {
         {loading ? (
           <div className="space-y-3" aria-busy="true" aria-label="Memuat akun">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="h-16 animate-pulse rounded-md bg-slate-100" />
+              <div key={i} className="h-16 skeleton rounded-md" />
             ))}
           </div>
         ) : items.length === 0 && !error ? (
@@ -118,8 +121,7 @@ export default function KatalogManager() {
           <KatalogTable
             items={items}
             busyId={busyId}
-            onArchive={(item) => run(item, 'archiveAccount', `Arsipkan akun ${item.code}? Akun akan hilang dari katalog publik, datanya tetap ada.`)}
-            onDelete={(item) => run(item, 'deleteAccountPermanently', `Hapus PERMANEN akun ${item.code}? Tindakan ini tidak bisa dikembalikan.`)}
+            onArchive={(item) => run(item, 'archiveAccount', `Pindahkan akun ${item.code} ke Sampah? Akun hilang dari katalog, dan bisa dipulihkan dari tab Sampah selama 30 hari.`)}
           />
         )}
       </div>

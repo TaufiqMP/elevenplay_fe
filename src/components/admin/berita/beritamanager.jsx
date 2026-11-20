@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useConfirm } from '@/components/ui/confirmdialog';
 import Link from 'next/link';
 import { getAdminNews, deleteAdminNews } from '@/api/adminnews';
 import { PlusCircleIcon } from '@/components/admin/icons';
@@ -8,6 +9,7 @@ import BeritaTable from './beritatable';
 
 // Client Component, karena token admin diambil dari sesi Supabase di browser.
 export default function BeritaManager() {
+  const confirm = useConfirm();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,7 +33,7 @@ export default function BeritaManager() {
   }, [load]);
 
   async function handleDelete(item) {
-    if (!window.confirm(`Hapus berita "${item.title}"?`)) return;
+    if (!(await confirm({ title: 'Arsipkan berita?', message: `"${item.title}" akan diarsipkan dan tidak tampil lagi di beranda.`, confirmText: 'Ya, arsipkan', danger: true }))) return;
     setDeletingId(item.id);
     try {
       await deleteAdminNews(item.id);
@@ -56,7 +58,7 @@ export default function BeritaManager() {
         </div>
         <Link
           href="/admin/berita/baru"
-          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md  bg-emerald-500 px-6 py-3 font-bold text-white hover:bg-emerald-600 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-md  bg-gradient-to-r from-orange-500 to-amber-500 shadow-md shadow-orange-500/30 px-6 py-3 font-bold text-white hover:from-orange-600 hover:to-amber-600 transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600"
         >
           <PlusCircleIcon />
           Tambah Berita Baru Beranda
@@ -67,7 +69,7 @@ export default function BeritaManager() {
         {loading ? (
           <div className="space-y-3" aria-busy="true" aria-label="Memuat berita">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-16 animate-pulse rounded-md bg-slate-100" />
+              <div key={i} className="h-16 skeleton rounded-md" />
             ))}
           </div>
         ) : error ? (

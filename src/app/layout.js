@@ -1,22 +1,14 @@
 import React from "react";
-import { Plus_Jakarta_Sans, Geist, Geist_Mono } from "next/font/google";
+import { Exo_2 } from "next/font/google";
 import "./globals.css";
 import AppShell from "@/components/layout/AppShell";
+import { ConfirmProvider } from "@/components/ui/confirmdialog";
 
-const plusJakartaSans = Plus_Jakarta_Sans({
-  variable: "--font-plus-jakarta-sans",
+//Satu font untuk seluruh situs (teks biasa dan kode akun)
+const exo2 = Exo_2({
+  variable: "--font-exo-2",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
 });
 
 export const metadata = {
@@ -34,12 +26,14 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="id"
-      className={`${plusJakartaSans.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${exo2.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans bg-slate-50 text-slate-800">
-        <AppShell>
-          {children}
-        </AppShell>
+      <body className="min-h-full flex flex-col bg-slate-50 text-slate-800">
+        <ConfirmProvider>
+          <AppShell>
+            {children}
+          </AppShell>
+        </ConfirmProvider>
       </body>
     </html>
   );

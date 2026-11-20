@@ -44,6 +44,18 @@ export default function Hero() {
               className="object-contain object-bottom"
             />
           </div>
+
+          {/* Maskot di layar besar: menempel di sisi kanan kotak, nyambung sampai dasar hero */}
+          <div className="pointer-events-none absolute -bottom-12 left-full z-10 -ml-64 mb-8 hidden h-[300px] w-[220px] md:block lg:h-[440px] lg:w-[320px]">
+            <Image
+              src="/mascot1.png"
+              alt=""
+              fill
+              priority
+              sizes="320px"
+              className="object-contain object-bottom"
+            />
+          </div>
         </div>
       </div>
     </section>

@@ -1,7 +1,15 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { useSettings } from '@/components/ui/usesettings';
+
+const WA_MESSAGE = encodeURIComponent('Halo Admin Elevenplay, saya ingin konsultasi transaksi aman');
 
 export default function Footer() {
+  //Akun TikTok dan nomor WA diambil dari Pengaturan admin
+  const settings = useSettings();
+
   return (
     <footer className="bg-white border-t border-slate-200 mt-16 text-slate-600">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 py-12">
@@ -22,26 +30,31 @@ export default function Footer() {
               Sosial Media
             </h3>
             <ul className="space-y-2 text-sm">
-              <li>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-orange-600 transition-colors"
-                >
-                  Instagram
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://tiktok.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-orange-600 transition-colors"
-                >
-                  Tiktok
-                </a>
-              </li>
+              {/* Instagram dan TikTok dari Pengaturan, disembunyikan kalau belum diisi */}
+              {settings?.instagram_url && (
+                <li>
+                  <a
+                    href={settings.instagram_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-orange-600 transition-colors"
+                  >
+                    Instagram
+                  </a>
+                </li>
+              )}
+              {settings?.tiktok_url && (
+                <li>
+                  <a
+                    href={settings.tiktok_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-orange-600 transition-colors"
+                  >
+                    Tiktok
+                  </a>
+                </li>
+              )}
               <li>
                 <a
                   href="https://youtube.com"
@@ -71,16 +84,18 @@ export default function Footer() {
                   Prosedur Transaksi Aman
                 </span>
               </li>
-              <li>
-                <a
-                  href="https://wa.me/6281234567890?text=Halo%20Admin%20Elevenplay,%20saya%20ingin%20konsultasi%20transaksi%20aman"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-orange-600 transition-colors font-medium text-emerald-600 hover:text-emerald-700"
-                >
-                  Kontak Admin WhatsApp
-                </a>
-              </li>
+              {settings?.whatsapp_url && (
+                <li>
+                  <a
+                    href={`${settings.whatsapp_url}?text=${WA_MESSAGE}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="hover:text-orange-600 transition-colors font-medium text-emerald-600 hover:text-emerald-700"
+                  >
+                    Kontak Admin WhatsApp
+                  </a>
+                </li>
+              )}
             </ul>
           </div>
 

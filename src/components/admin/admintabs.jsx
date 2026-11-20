@@ -1,9 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { BallIcon, NewsIcon, ShieldIcon } from '@/components/admin/icons';
+import { BallIcon, CalendarIcon, GearIcon, NewsIcon, ShieldIcon, TrashIcon } from '@/components/admin/icons';
+import SampahManager from '@/components/admin/sampah/sampahmanager';
 import BeritaManager from '@/components/admin/berita/beritamanager';
 import KatalogManager from '@/components/admin/katalog/katalogmanager';
+import JadwalManager from '@/components/admin/jadwal/jadwalmanager';
+import PengaturanManager from '@/components/admin/pengaturan/pengaturanmanager';
+import ForumModeration from '@/components/admin/forum/forummoderation';
 
  
 function Placeholder({ title }) {
@@ -19,10 +23,13 @@ function Placeholder({ title }) {
 const TABS = [
   { id: 'berita', label: 'Kelola Berita Beranda', icon: NewsIcon, panel: () => <BeritaManager /> },
   { id: 'katalog', label: 'Kelola E-Katalog Skuad', icon: BallIcon, panel: () => <KatalogManager /> },
-  { id: 'forum', label: 'Moderasi Forum', icon: ShieldIcon, panel: () => <Placeholder title="Moderasi Forum" /> },
+  { id: 'jadwal', label: 'Kelola Jadwal', icon: CalendarIcon, panel: () => <JadwalManager /> },
+  { id: 'forum', label: 'Moderasi Forum', icon: ShieldIcon, panel: () => <ForumModeration /> },
+  { id: 'pengaturan', label: 'Pengaturan', icon: GearIcon, panel: () => <PengaturanManager /> },
+  { id: 'sampah', label: 'Sampah', icon: TrashIcon, panel: () => <SampahManager /> },
 ];
  
-export default function AdminTabs({ forumPending = 0 }) {
+export default function AdminTabs() {
   const [active, setActive] = useState('berita');
   const current = TABS.find((t) => t.id === active);
  
@@ -52,7 +59,6 @@ export default function AdminTabs({ forumPending = 0 }) {
             >
               <Icon />
               {label}
-              {id === 'forum' && forumPending > 0 && ` (${forumPending})`}
             </button>
           );
         })}

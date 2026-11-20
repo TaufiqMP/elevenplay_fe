@@ -71,13 +71,20 @@ export default function BeritaTable({ items, onDelete, deletingId }) {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center justify-end gap-4">
-                    <Link
-                      href={`/forum/${item.slug}`}
-                      aria-label={`Lihat ${item.title}`}
-                      className="text-slate-800 hover:text-orange-600"
-                    >
-                      <EyeIcon />
-                    </Link>
+                    {/* Halaman publik hanya ada untuk berita yang tayang */}
+                    {item.status === 'published' ? (
+                      <Link
+                        href={`/berita/${item.slug}`}
+                        aria-label={`Lihat ${item.title}`}
+                        className="text-slate-800 hover:text-orange-600"
+                      >
+                        <EyeIcon />
+                      </Link>
+                    ) : (
+                      <span title="Belum tayang di halaman publik" className="cursor-not-allowed text-slate-300">
+                        <EyeIcon />
+                      </span>
+                    )}
                     <Link
                       href={`/admin/berita/${item.id}/edit`}
                       aria-label={`Ubah ${item.title}`}

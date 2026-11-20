@@ -1,5 +1,8 @@
 import AdminTabs from '@/components/admin/admintabs';
 
+//Halaman admin selalu butuh login (dijaga AdminGuard), jadi validasi navigasi instan tidak diperlukan
+export const instant = false;
+
 export const metadata = {
   title: 'Pusat Kendali Admin',
   robots: { index: false, follow: false }, // jangan masuk hasil pencarian Google
@@ -15,8 +18,7 @@ export default function AdminPage() {
         Kelola konten informasi Beranda, data E-Katalog, serta pantau dan moderasi Forum Komunitas.
       </p>
 
-      {/* TODO: jumlah moderasi forum diambil dari API */}
-      <AdminTabs forumPending={12} />
+      <AdminTabs />
     </div>
   );
 }
